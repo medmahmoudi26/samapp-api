@@ -11,7 +11,7 @@ var mongoose = require("mongoose");
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
-mongoose.connect("mongodb+srv://sampapp:sampapp@sampapp.je4ye.mongodb.net/<dbname>?retryWrites=true&w=majority");
+mongoose.connect("mongodb+srv://sampapp:sampapp@sampapp.je4ye.mongodb.net/sampapp?retryWrites=true&w=majority");
 
 var app = express();
 
