@@ -32,7 +32,7 @@ router.get('/', checkAuth, function(req, res, next) {
   }
 });
 
-router.get('/register', function (req, res) {
+router.post('/register', function (req, res) {
   var hashedPass = bcrypt.hashSync(req.body.password, 10);
   User.create({
     name: req.body.name,
