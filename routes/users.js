@@ -44,10 +44,10 @@ router.post('/register', function (req, res) {
     address: req.body.address,
     city: req.body.city,
     role: req.body.role,
-    active: false
+    active: (req.body.role == "patient")
   }, function (error, user) {
     if (error) res.status(500).json({error: error});
-    else res.json({success_msg: "En attente de la vérification de l'administrateur"});
+    else res.json({success_msg: "Compte crée"});
   });
 });
 
@@ -57,7 +57,6 @@ router.post('/login', function (req, res) {
   }
   else {
     User.findOne({email: req.body.email, active: true}, function (err, user) {
-      console.log(user);
       if (err) {
         res.status(400).json({error_msg: err});
         console.log(err);
