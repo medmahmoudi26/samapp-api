@@ -57,17 +57,17 @@ router.post('/login', function (req, res) {
   }
   else {
     User.findOne({email: req.body.email, active: true}, function (err, user) {
+      console.log(user);
       if (err) {
         res.status(400).json({error_msg: err});
         console.log(err);
       }
-
-      if (!user) {
+      else if (!user) {
         res.status(400).json({error_msg: "Utilisateur n'existe pas"});
         console.log("User no exist");
       }
 
-      if (bcrypt.compareSync(req.body.password, user.password)) {
+      else if (bcrypt.compareSync(req.body.password, user.password)) {
         res.status(200).json({
           token: createToken(user)
         });
