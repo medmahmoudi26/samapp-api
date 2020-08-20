@@ -5,6 +5,7 @@ var {checkAuth} = require("../middleware/checkAuth.js");
 var jwt = require("jsonwebtoken");
 
 var User = require("../models/user.js");
+var Diplome = require("../models/diplome.js");
 
 function createToken(user) {
     return jwt.sign({ id: user.id, email: user.email, role: user.role }, "sampapp", {
@@ -47,7 +48,15 @@ router.post('/register', function (req, res) {
     active: (req.body.role == "patient")
   }, function (error, user) {
     if (error) res.status(500).json({error: error});
-    else res.json({success_msg: "Compte crée"});
+    else {
+      Diplome.create({
+        diplome: req.body.diplome,
+        annediplome: req.body.annediplome
+      }, function (error, diplome) {
+        if (error) res.json(500).json({error: error});
+        else res.json({success_msg: "Compte crée"})
+      });
+    }
   });
 });
 
