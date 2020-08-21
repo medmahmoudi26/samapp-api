@@ -11,7 +11,9 @@ var UserSchema = new Schema ({
   address       : {type: String, required: true},
   city          : {type: String, required: true},
   role          : {type: String, required: true},
-  active        : {type: Boolean, required: true}
+  active        : {type: Boolean, required: true},
+  resetPasswordToken: String,
+  resetPasswordExpires: Date
 });
 
 module.exports = mongoose.model('user',UserSchema);
