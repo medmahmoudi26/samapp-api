@@ -12,8 +12,7 @@ router.get('/', function(req, res, next) {
 
 router.post("/forgot", function (req,res) {
   if (req.isAuthenticated()) {
-    req.flash("error_msg", "vous etes déja connecté");
-    res.redirect("/user/profile");
+    res.status(400).json({error_msg: "Utilisateur déja authetifié"});
   } else {
     User.findOne({email: req.body.email}, function (err, user) {
       if (err) {
@@ -46,6 +45,60 @@ router.post("/forgot", function (req,res) {
         });
       } else {
         res.status(400).json({error_msg: "utilisateur non trouvé"});
+      }
+    });
+  }
+});
+
+router.get('/reset/:token', function (req,res) {
+  User.findOne({resetPasswordToken: req.params.token, resetPasswordExpires: {$gt: Date.now() } }, function (error, user) {
+    if (error) {
+      res.status(500).json({error_msg: error});
+    } else if (!user) {
+      res.status(500).json({error_msg: "Utilisateur non trouvé"})
+    } else {
+      res.send({success_msg: "Valid token"})
+    }
+  });
+});
+
+router.post('/reset/:token', function (req,res) {
+  if (req.isAuthenticated()) {
+    res.json(400).json({error_msg: "Utilisateur déja authentifié"});
+  } else {
+    User.findOne({ resetPasswordToken: req.params.token, resetPasswordExpires: { $gt: Date.now() } }, function (error, user) {
+      if (error) {
+        res.status(500).json({error_msg: error});
+      } else if (!user) {
+        res.status(500).json({error_msg: "Utilisateur non trouvé"})
+      } else {
+        if (req.body.password === req.body.confirm) {
+          var hashedpass = bcrypt.hashSync(req.body.password, 10);
+          User.findOneAndUpdate({_id: user._id}, {$set:{
+            password: hashedpass,
+            resetPasswordToken: undefined,
+            resetPasswordExpires: undefined
+          }}, {new: true}, function (error, user) {
+            if (error) {
+              res.status(500).json({error_msg: error});
+            }
+            req.login(user, function (err) {
+              var mailOptions = {
+                to: user.email,
+                from: 'easytraveltechera@gmail.com',
+                subject: 'Votre mot de passe est changé',
+                text: "le mot de passe de votre compte "+user.email+" est changé"
+              }
+              transporter.sendMail(mailOptions, function (error, sent) {
+                if (error) console.log("Error sending reset confirmation mail => "+error);
+                else if (sent) console.log("Confirmation reset mail sent");
+              });
+            });
+            res.json({success_msg: "Mot de passe est correctement changé"})
+          });
+        } else {
+          res.status(500).json({error_msg: "confirmer votre mot de passe correctement"});
+        }
       }
     });
   }

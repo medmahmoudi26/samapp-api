@@ -7,6 +7,7 @@ var bodyParser = require("body-parser");
 var cors = require("cors");
 var passport = require("passport");
 var mongoose = require("mongoose");
+var fileUpload = require('express-fileupload');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -18,6 +19,11 @@ var app = express();
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
+
+// upload functionality
+app.use(fileUpload({
+  createParentPath: true
+}));
 
 //passport configuring
 app.use(passport.initialize());

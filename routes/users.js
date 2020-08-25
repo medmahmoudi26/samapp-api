@@ -49,9 +49,16 @@ router.post('/register', function (req, res) {
   }, function (error, user) {
     if (error) res.status(500).json({error: error});
     else {
+      uploadpath = __dirname+'/../public/images/'+id+image.name
+      image.mv(uploadpath, function (err) {
+        if (err) console.log(err);
+      });
+      var t = new Date();
       Diplome.create({
+        userId: req.user._id,
         diplome: req.body.diplome,
-        annediplome: req.body.annediplome
+        annediplome: req.body.annediplome,
+        filediplome: t.getTime()+req.files.diplome.name
       }, function (error, diplome) {
         if (error) res.json(500).json({error: error});
         else res.json({success_msg: "Compte crée"})
