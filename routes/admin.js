@@ -13,13 +13,28 @@ function createToken(user) {
 }
 
 router.get("/", checkAdmin, function (req, res) {
-  res.json({user: req.user});
+  User.find({active: false}, function (error, non_active) {
+    if (error) res.status(500).json({error_msg: error});
+    else res.json({user: req.user, non_active: non_active});
+  })
 });
 
 router.get("/approve/:id", checkAdmin, function (req, res) {
   User.findByIdAndUpdate(req.params.id, {$set: {active: true}}, function (error, user) {
     if (error) res.status(500).json({error: error});
     else res.json({success_msg: "account activated"});
+  });
+});
+
+router.get("/refuse/:id", checkAdmin, function (req, res) {
+  User.findOne({_id: req.params.id, active: false}, function (error, user) {
+    if (error) res.status(500).json({error: error});
+    else {
+      user.remove(function (error) {
+        if (error) res.json(500).json({error_msg: error});
+        else res.json({success_msg: "account deleted"});
+      });
+    }
   });
 });
 
