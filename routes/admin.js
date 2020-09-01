@@ -3,6 +3,7 @@ var router = express.Router();
 var bcrypt = require("bcrypt")
 var {checkAdmin} = require("../middleware/checkAdmin.js");
 var jwt = require("jsonwebtoken");
+var nodemailer = require("nodemailer");
 
 var User = require("../models/user.js");
 
@@ -22,7 +23,19 @@ router.get("/", checkAdmin, function (req, res) {
 router.get("/approve/:id", checkAdmin, function (req, res) {
   User.findByIdAndUpdate(req.params.id, {$set: {active: true}}, function (error, user) {
     if (error) res.status(500).json({error: error});
-    else res.json({success_msg: "account activated"});
+    else {
+      var mailOptions = {
+        to: user.email,
+        from: 'noreply@sampapp.com',
+        subject: 'Compte activé',
+        text: "Votre demande est approuvée"
+      }
+      transporter.sendMail(mailOptions, function (err) {
+        if (err) console.log('Reset mail failed => '+err)
+        console.log('Reset email sent');
+        res.json({success_msg: "Email envoyé"})
+      });
+    }
   });
 });
 
@@ -36,6 +49,14 @@ router.get("/refuse/:id", checkAdmin, function (req, res) {
       });
     }
   });
+});
+
+var transporter = nodemailer.createTransport({
+  service: 'sampapp',
+  auth: {
+    user: 'noreply',
+    pass: '^[m&-wh!qcD?'
+  }
 });
 
 module.exports = router;

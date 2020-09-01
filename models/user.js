@@ -12,7 +12,7 @@ var UserSchema = new Schema ({
   city          : {type: String, required: true},
   role          : {type: String, required: true},
   active        : {type: Boolean, required: true},
-  resetPasswordToken: String,
+  resetPasswordCode: String,
   resetPasswordExpires: Date
 });
 

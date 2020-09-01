@@ -18,11 +18,10 @@ router.post("/forgot", function (req,res) {
       if (err) {
         res.status(400).json({error: err});
       } else if (user) {
-        crypto.randomBytes(20, function (err, buf) {
-          var token = buf.toString('hex');
+          var code = createCode(6);
           user.update({
             $set:{
-              resetPasswordToken: token,
+              resetPasswordCode: code,
               resetPasswordExpires: Date.now() + 360000 // 1 hour
             }
           }, function (error, saved) {
@@ -31,9 +30,9 @@ router.post("/forgot", function (req,res) {
             } else if (saved) {
               var mailOptions = {
                 to: user.email,
-                from: 'easytraveltechera@gmail.com',
-                subject: 'Password Reset',
-                text: 'http://'+req.headers.host+'/user/reset/'+token+'\n\n'
+                from: 'noreply@sampapp.com',
+                subject: 'Password Reset Code',
+                text: code
               }
               transporter.sendMail(mailOptions, function (err) {
                 if (err) console.log('Reset mail failed => '+err);
@@ -42,7 +41,6 @@ router.post("/forgot", function (req,res) {
               });
             }
           });
-        });
       } else {
         res.status(400).json({error_msg: "utilisateur non trouvé"});
       }
@@ -50,23 +48,11 @@ router.post("/forgot", function (req,res) {
   }
 });
 
-router.get('/reset/:token', function (req,res) {
-  User.findOne({resetPasswordToken: req.params.token, resetPasswordExpires: {$gt: Date.now() } }, function (error, user) {
-    if (error) {
-      res.status(500).json({error_msg: error});
-    } else if (!user) {
-      res.status(500).json({error_msg: "Utilisateur non trouvé"})
-    } else {
-      res.send({success_msg: "Valid token"})
-    }
-  });
-});
-
-router.post('/reset/:token', function (req,res) {
+router.post('/reset', function (req,res) {
   if (req.isAuthenticated()) {
     res.json(400).json({error_msg: "Utilisateur déja authentifié"});
   } else {
-    User.findOne({ resetPasswordToken: req.params.token, resetPasswordExpires: { $gt: Date.now() } }, function (error, user) {
+    User.findOne({ resetPasswordCode: req.body.code, resetPasswordExpires: { $gt: Date.now() } }, function (error, user) {
       if (error) {
         res.status(500).json({error_msg: error});
       } else if (!user) {
@@ -76,7 +62,7 @@ router.post('/reset/:token', function (req,res) {
           var hashedpass = bcrypt.hashSync(req.body.password, 10);
           User.findOneAndUpdate({_id: user._id}, {$set:{
             password: hashedpass,
-            resetPasswordToken: undefined,
+            resetPasswordCode: undefined,
             resetPasswordExpires: undefined
           }}, {new: true}, function (error, user) {
             if (error) {
@@ -85,7 +71,7 @@ router.post('/reset/:token', function (req,res) {
             req.login(user, function (err) {
               var mailOptions = {
                 to: user.email,
-                from: 'easytraveltechera@gmail.com',
+                from: 'noreply@sampapp.com',
                 subject: 'Votre mot de passe est changé',
                 text: "le mot de passe de votre compte "+user.email+" est changé"
               }
@@ -104,11 +90,21 @@ router.post('/reset/:token', function (req,res) {
   }
 });
 
+function createCode(length) {
+   var result           = '';
+   var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+   var charactersLength = characters.length;
+   for ( var i = 0; i < length; i++ ) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+   }
+   return result;
+}
+
 var transporter = nodemailer.createTransport({
-  service: 'gmail',
+  service: 'sampapp',
   auth: {
-    user: '',
-    pass: ''
+    user: 'noreply',
+    pass: '^[m&-wh!qcD?'
   }
 });
 
