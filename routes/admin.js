@@ -13,14 +13,14 @@ function createToken(user) {
       });
 }
 
-router.get("/", checkAdmin, function (req, res) {
+router.get("/", passport.authenticate("jwt", {session: false}), checkAdmin, function (req, res) {
   User.find({active: false}, function (error, non_active) {
     if (error) res.status(500).json({error_msg: error});
     else res.json({user: req.user, non_active: non_active});
   })
 });
 
-router.get("/approve/:id", checkAdmin, function (req, res) {
+router.get("/approve/:id", passport.authenticate("jwt", {session: false}), checkAdmin, function (req, res) {
   User.findByIdAndUpdate(req.params.id, {$set: {active: true}}, function (error, user) {
     if (error) res.status(500).json({error: error});
     else {
@@ -39,7 +39,7 @@ router.get("/approve/:id", checkAdmin, function (req, res) {
   });
 });
 
-router.get("/refuse/:id", checkAdmin, function (req, res) {
+router.get("/refuse/:id", passport.authenticate("jwt", {session: false}), checkAdmin, function (req, res) {
   User.findOne({_id: req.params.id, active: false}, function (error, user) {
     if (error) res.status(500).json({error: error});
     else {

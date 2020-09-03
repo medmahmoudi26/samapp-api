@@ -1,8 +1,8 @@
 var express = require('express');
 var router = express.Router();
 var bcrypt = require("bcrypt")
-var {checkAuth} = require("../middleware/checkAuth.js");
 var jwt = require("jsonwebtoken");
+var passport = require("passport")
 
 var User = require("../models/user.js");
 var Diplome = require("../models/diplome.js");
@@ -14,20 +14,18 @@ function createToken(user) {
 }
 
 /* GET users listing. */
-router.get('/', checkAuth, function(req, res, next) {
+router.get('/', passport.authenticate("jwt", {session: false}), function(req, res, next) {
   switch (req.user.role) {
     case "patient":
-      res.redirect("/patient")
-      break;
+      res.json({role : "/patient"});
     case "medecin":
-      res.redirect("/medecin");
-      break;
+      res.json({role : "medecin"});
     case "infirmier":
-      res.redirect("/infirmier");
-      break;
+      res.json({role : "infirmier"});
     case "labo":
-      res.redirect("/labo");
-      break;
+      res.json({role : "labo"})
+    case "admin":
+      res.json({role : "admin"})
     default:
       res.json({error: "Role inconnu"});
   }
