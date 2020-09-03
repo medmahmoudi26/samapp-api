@@ -82,7 +82,8 @@ router.post('/login', function (req, res) {
 
       else if (bcrypt.compareSync(req.body.password, user.password)) {
         res.status(200).json({
-          token: createToken(user)
+          token: createToken(user),
+          user: user
         });
       } else {
         res.status(400).json({error_msg: "Mot de passe non valide"});
