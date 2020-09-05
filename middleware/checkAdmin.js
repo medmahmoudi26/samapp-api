@@ -1,5 +1,5 @@
 module.exports = {
-  checkAuth: function (req,res,next) {
+  checkAdmin: function (req,res,next) {
     if (req.user.active && req.user.role == "admin") {
       return next()
     } else {

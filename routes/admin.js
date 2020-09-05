@@ -1,11 +1,13 @@
 var express = require('express');
-var router = express.Router();
 var bcrypt = require("bcrypt")
 var {checkAdmin} = require("../middleware/checkAdmin.js");
 var jwt = require("jsonwebtoken");
 var nodemailer = require("nodemailer");
+var passport = require("passport");
 
 var User = require("../models/user.js");
+
+var router = express.Router();
 
 function createToken(user) {
     return jwt.sign({ id: user.id, email: user.email, role: user.role }, "sampapp", {
@@ -13,11 +15,11 @@ function createToken(user) {
       });
 }
 
-router.get("/", passport.authenticate("jwt", {session: false}), checkAdmin, function (req, res) {
+router.get("/", passport.authenticate("jwt", {session: false}), checkAdmin, function (req, res, next) {
   User.find({active: false}, function (error, non_active) {
     if (error) res.status(500).json({error_msg: error});
     else res.json({user: req.user, non_active: non_active});
-  })
+  });
 });
 
 router.get("/approve/:id", passport.authenticate("jwt", {session: false}), checkAdmin, function (req, res) {
