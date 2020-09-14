@@ -54,9 +54,11 @@ router.get("/refuse/:id", passport.authenticate("jwt", {session: false}), checkA
 });
 
 var transporter = nodemailer.createTransport({
-  service: 'sampapp',
+  host: 'server33.web-hosting.com',
+  port: 465,
+  secure: true, // use SSL
   auth: {
-    user: 'noreply',
+    user: 'noreply@sampapp.com',
     pass: '^[m&-wh!qcD?'
   }
 });
