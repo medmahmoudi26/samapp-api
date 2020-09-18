@@ -48,6 +48,22 @@ router.post("/forgot", function (req,res) {
   }
 });
 
+router.post('/verifyCode', function () {
+  if (req.isAuthenticated()) {
+    res.json(400).json({error_msg: "Utilisateur déja authentifié"})
+  } else {
+    User.findOne({resetPasswordCode: req.body.code, resetPasswordExpires: { $gt: Date.now() }}, function (error, user) {
+      if (error) console.log(error);
+      else if (user){
+        res.status(200).json({user: user});
+      }
+      else {
+        res.status(403).json({error_msg: "Utlisateur n'existe pas"});
+      }
+    });
+  }
+});
+
 router.post('/reset', function (req,res) {
   if (req.isAuthenticated()) {
     res.json(400).json({error_msg: "Utilisateur déja authentifié"});
