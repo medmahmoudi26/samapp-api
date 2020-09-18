@@ -48,7 +48,7 @@ router.post("/forgot", function (req,res) {
   }
 });
 
-router.post('/verifyCode', function () {
+router.post('/verifyCode', function (req, rse) {
   if (req.isAuthenticated()) {
     res.json(400).json({error_msg: "Utilisateur déja authentifié"})
   } else {
