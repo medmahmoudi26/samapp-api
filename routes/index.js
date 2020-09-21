@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var crypto = require("crypto");
 var nodemailer = require("nodemailer");
+var bcrypt = require("bcrypt");
 
 var User = require("../models/user.js");
 
@@ -32,7 +33,7 @@ router.post("/forgot", function (req,res) {
                 to: user.email,
                 from: 'noreply@sampapp.com',
                 subject: 'Password Reset Code',
-                text: code
+                text: "Votre code de restauration de compte est : "+code
               }
               transporter.sendMail(mailOptions, function (err) {
                 if (err) console.log('Reset mail failed => '+err);
@@ -48,7 +49,7 @@ router.post("/forgot", function (req,res) {
   }
 });
 
-router.post('/verifyCode', function (req, rse) {
+router.post('/verifyCode', function (req, res) {
   if (req.isAuthenticated()) {
     res.json(400).json({error_msg: "Utilisateur déja authentifié"})
   } else {
@@ -89,7 +90,7 @@ router.post('/reset', function (req,res) {
                 to: user.email,
                 from: 'noreply@sampapp.com',
                 subject: 'Votre mot de passe est changé',
-                text: "le mot de passe de votre compte "+user.email+" est changé"
+                text: "le mot de passe de votre compte "+user.surname+" est changé"
               }
               transporter.sendMail(mailOptions, function (error, sent) {
                 if (error) console.log("Error sending reset confirmation mail => "+error);
