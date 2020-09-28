@@ -92,4 +92,47 @@ router.post('/login', function (req, res) {
   }
 });
 
+router.post('updateuser', passport.authenticate("jwt", {session: false}), function (req, res) {
+  User.findOneAndUpdate({_id: req.user._id}, {$set {
+    name      : req.body.name,
+    surname   : req.body.surname,
+    cin       : req.body.cin,
+    birthdate : req.body.birthdate,
+    address   : req.body.address,
+    city      : req.body.city,
+    latitude  : req.body.latitude,
+    longitude : req.body.longitude
+  }}, {new: true}, function (error, user) {
+    if (error) res.status(500).json({error_msg: error});
+    eles {
+      res.json(user)
+    }
+  })
+})
+
+router.post('/requestInfirmier', passport.authenticate("jwt", {session: false}), function (req, res) {
+  User.find({role: "infirmier", connected: true}, function (error, infirmiers) { // long et lat
+    if (error) res.status(500).json({error_message: error})
+    else {
+      res.json(infirmiers);
+    }
+  });
+});
+
+router.get('/status', passport.authenticate("jwt", {session: false}), function (req, res) {
+  User.findOne({_id: req.user._id}, function (error, user) {
+    if (error) res.status(500).json(error);
+    else {
+      if (user.conencted) {
+        user.update({connected: false});
+        res.json({success_msg: "status updated"})
+      }
+      else {
+        user.update({connected: true});
+        res.json({success_msg: "status updated"});
+      }
+    }
+  })
+})
+
 module.exports = router;
