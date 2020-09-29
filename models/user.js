@@ -12,8 +12,8 @@ var UserSchema = new Schema ({
   city          : {type: String, required: true},
   role          : {type: String, required: true},
   active        : {type: Boolean, required: true},
-  latitude      : Numbre,
-  longitude     : Numbre,
+  latitude      : Number,
+  longitude     : Number,
   connected     : {type: Boolean, default: false},
   resetPasswordCode: String,
   resetPasswordExpires: Date

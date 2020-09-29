@@ -93,7 +93,7 @@ router.post('/login', function (req, res) {
 });
 
 router.post('updateuser', passport.authenticate("jwt", {session: false}), function (req, res) {
-  User.findOneAndUpdate({_id: req.user._id}, {$set {
+  User.findOneAndUpdate({_id: req.user._id}, {$set :{
     name      : req.body.name,
     surname   : req.body.surname,
     cin       : req.body.cin,
@@ -104,7 +104,7 @@ router.post('updateuser', passport.authenticate("jwt", {session: false}), functi
     longitude : req.body.longitude
   }}, {new: true}, function (error, user) {
     if (error) res.status(500).json({error_msg: error});
-    eles {
+    else {
       res.json(user)
     }
   })
