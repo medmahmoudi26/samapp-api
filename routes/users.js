@@ -128,11 +128,11 @@ router.get('/status', passport.authenticate("jwt", {session: false}), function (
     if (error) res.status(500).json(error);
     else {
       if (user.conencted) {
-        user.update({connected: false, latitude: latitude, longtitude: longtitude});
+        user.update({connected: false, latitude: latitude, longitude: longitude});
         res.json({success_msg: "status updated"})
       }
       else {
-        user.update({connected: true, latitude: latitiude, longtitude: longtitude});
+        user.update({connected: true, latitude: latitude, longitude: longitude});
         res.json({success_msg: "status updated"});
       }
     }
