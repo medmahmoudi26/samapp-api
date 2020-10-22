@@ -114,7 +114,7 @@ router.post('/updateuser', passport.authenticate("jwt", {session: false}), funct
   })
 })
 
-router.post('/requestInfirmier', passport.authenticate("jwt", {session: false}), function (req, res) {
+router.get('/requestInfirmier', passport.authenticate("jwt", {session: false}), function (req, res) {
   User.find({role: "infirmier", connected: true}, function (error, infirmiers) { // long et lat
     if (error) res.status(500).json({error_message: error})
     else {
@@ -123,16 +123,16 @@ router.post('/requestInfirmier', passport.authenticate("jwt", {session: false}),
   });
 });
 
-router.get('/status', passport.authenticate("jwt", {session: false}), function (req, res) {
+router.post('/status', passport.authenticate("jwt", {session: false}), function (req, res) {
   User.findOne({_id: req.user._id}, function (error, user) {
     if (error) res.status(500).json(error);
     else {
       if (user.conencted) {
-        user.update({connected: false, latitude: latitude, longitude: longitude});
+        user.update({connected: false, latitude: req.body.latitude, longitude: req.body.longitude});
         res.json({success_msg: "status updated"})
       }
       else {
-        user.update({connected: true, latitude: latitude, longitude: longitude});
+        user.update({connected: true, latitude: req.body.latitude, longitude: req.body.longitude});
         res.json({success_msg: "status updated"});
       }
     }
